@@ -3,16 +3,16 @@
 
 To install dependencies
 
-  yarn
+    yarn
   
 To build
 
-  yarn build
+    yarn build
   
 To run
   
-  yarn watch
+    yarn watch
   
 And also in another shell you need to launch the simlated API
 
-  yarn api
+    yarn api
