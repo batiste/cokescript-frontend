@@ -1,0 +1,30 @@
+{
+  "name": "coke-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "coke **/*.coke *.coke -c",
+    "serve": "node server.coke.js",
+    "api": "node api.coke.js",
+    "watch": "nodemon -e coke,html --exec \"yarn run build && node server.coke.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "*.coke.js",
+      "**/*.coke.js"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cokescript": "^0.0.7",
+    "epegjs": "^0.0.55",
+    "express": "^4.16.2",
+    "express-http-proxy": "^1.1.0",
+    "glob": "^7.1.2",
+    "nodemon": "^1.14.12",
+    "virtual-dom": "^2.1.1"
+  }
+}

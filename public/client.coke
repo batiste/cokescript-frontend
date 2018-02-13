@@ -1,0 +1,122 @@
+
+# expose the virtual-dom hyperscript function
+h = cokescript.h
+app = document.getElementById("app")
+
+# main render function
+dom render()
+  <ul>
+    for job in jobs.jobs
+      <li>
+        if edit == job.id
+          =jobEditRender(job)
+        else
+          =jobRender(job)
+  <button id="patch">
+    ="Refetch the job list"
+    
+dom jobRender(job)
+  ="Company: " + job.company
+  =", Job: " + job.title
+  =", Keywords: " + job.keywords.join(', ')
+  <button className="edit" dataset={event: "job", id: job.id}>
+    ="Edit this job"
+    
+dom jobEditRender(job)
+  <div id="edit-form">
+    <input value=job.company name="company">
+    <input value=job.title name="title">
+    <input value=job.keywords name="keywords">
+    <button dataset={event: "save", id: job.id}>
+      ="Save"
+    <button dataset={event: "delete", id: job.id}>
+      ="Delete"
+    <button dataset={event: "cancel", id: job.id}>
+      ="Cancel"
+
+# our data model
+jobs = {jobs: {}}
+edit = null
+
+def getJobs()
+  return fetch("/api/jobs").then(def(response)
+    return response.json().then(def(json)
+      jobs := json
+      return json
+    )
+  )
+  
+def saveJob(target)
+  id = parseInt(target.dataset.id, 10)
+  data = {}
+  document.querySelectorAll('#edit-form input').forEach(def(input)
+    data[input.name] = input.value
+  )
+  return fetch("/api/jobs/#{id}", {method: 'PUT', body: JSON.stringify(data)}).then(def(response)
+    return response.json().then(def(json)
+      jobs.jobs[json.id] = json
+      edit := null
+      patch()
+    )
+  )
+
+def deleteJob(target)
+  id = parseInt(target.dataset.id, 10)
+  return fetch("/api/jobs/#{id}", {method: 'DELETE'}).then(def(response)
+    return response.json().then(def(json)
+      remainingJobs = {}
+      for job in jobs.jobs
+        if job.id != json.id
+          remainingJobs[job.id] = job
+      jobs.jobs = remainingJobs
+      edit := null
+      patch()
+    )
+  )
+
+# booting the lifecyle
+virtualDom = null
+realDom = null
+
+def refreshJobs()
+  getJobs().then(def()
+    patch()
+  )
+
+def editJob(target)
+  id = parseInt(target.dataset.id, 10)
+  edit := id
+  patch()
+
+eventRegister = {
+  job: editJob,
+  cancel: def(job)
+    edit := null
+    patch()
+  ,
+  save: saveJob,
+  delete: deleteJob
+}
+
+def bindEvents()
+  document.getElementById('patch').addEventListener('click', refreshJobs)
+  def clickDelegation(e)
+    event = eventRegister[e.target.dataset.event]
+    if event
+      event(e.target, e)
+  app.addEventListener('click', clickDelegation)
+
+getJobs().then(def()
+  virtualDom := cokescript.h("div", render())
+  realDom := cokescript.create(virtualDom)
+  app.innerHTML = ""
+  app.appendChild(realDom)
+  bindEvents()
+)
+
+# diff and patch the dom
+def patch(e)
+  newVirtualDom = cokescript.h("div", render())
+  patches = cokescript.diff(virtualDom, newVirtualDom)
+  cokescript.patch(realDom, patches)
+  virtualDom := newVirtualDom

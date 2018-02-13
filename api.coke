@@ -1,0 +1,31 @@
+express = require("express")
+app = express()
+
+def job(id)
+  return {
+    id: parseInt(id, 10),
+    title: 'title ' + Math.round((Math.random() + 0.5) * 1000),
+    company: 'company ' + Math.round((Math.random() + 0.5) * 1000),
+    keywords: ["kubernetes", "linux"]
+  }
+
+app.put("/jobs/:id", def(req, res)
+  res.status(200).json(job(req.params.id))
+)
+
+app.delete("/jobs/:id", def(req, res)
+  res.status(200).json(job(req.params.id))
+)
+
+app.post("/jobs/", def(req, res)
+  res.status(200).json(job(req.params.id))
+)
+
+app.get("/jobs", def(req, res)
+  jobs = {}
+  [1, 2, 3].forEach(def(id) jobs[id] = job(id))
+  res.status(200).json({jobs: jobs})
+)
+
+app.listen(3004)
+console.log("Simulated API stated on port 3004")
