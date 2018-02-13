@@ -1,6 +1,8 @@
 
 # Frontend written in CokeScript to a simple REST API backend
 
+What is Cokescript? https://github.com/batiste/CokeScript
+
 To install dependencies
 
     yarn
